@@ -26,7 +26,7 @@ function GameBoard() {
         }
     }
 
-    //Define the Combo to check whin or loose
+    //Basic elements - Define the Combo to check whin or loose
     const winCheckCombos = [
         //the rows
         [board[0][0],board[0][1],board[0][2]],
@@ -42,26 +42,28 @@ function GameBoard() {
     ];
 
     
-    //The 'Getter'
+    //Return Function: the 'Getter'
     const getBoard = () => board;
 
-    //Log
+    //Return Function: the log
     const printBoard = () => {
         const boardWithCellValues = board.map(row => row.map(cell => cell.getValue()));
         console.log(boardWithCellValues);
     }
 
-    //The 'Setter' (without judging whether the cell is full)
+    //Return Function: the 'Setter' 
+    // (simple setter,without judging whether the cell is full)
     const placeMark = (row, column, token) => {
         board[row][column].addToken(token);
     }
 
-    //Judge whether the cell is empty, return true/false
-    const isEmptyCell = (row, column) => {
+    //Return Function: isCellEmpty
+    // (Judge whether the cell is empty, return true/false)
+    const isCellFull = (row, column) => {
         if (board[row][column].getValue()) {
-            return false;
-        } else {
             return true;
+        } else {
+            return false;
         }
     }
 
@@ -69,46 +71,47 @@ function GameBoard() {
         getBoard,
         printBoard,
         placeMark,
-        isEmptyCell,
+        isCellFull,
         winCheckCombos,
     }
 }
 
 //Create GameController
 function GameController (
-    playerOneName = 'Gamer',
-    playerTwoName = 'AI'
+    playerName = 'Gamer',
 ) {
 
     //Basic elements
+
+    //initial board
     const board = GameBoard();
     
     const players = [
         {
-            name: playerOneName,
+            name: playerName,
             token: 1
         },
         {
-            name: playerTwoName,
+            name: 'AI',
             token: 2
         }
     ];
 
     let activePlayer = players[0];
 
+    //Inner Function: 'switchPlayerTurn'
     const switchPlayerTurn = () => activePlayer = activePlayer === players[0] ? players[1] : players[0];
 
-    //Inner Function: 'printPresentRound'
-    // (since it should be called automatically in the end of 'playRound', inner function is fine)
-    const printPresentRound = () => {
+    //Inner Function: 'logPresentRound'
+    const logPresentRound = () => {
         console.log(`${getActivePlayer().name}'s turn:`);
         board.printBoard();
     };
 
-    //Inner Function: 'checkWin'
-    //(check and return winner's token. if no winner, return 0)
+    //Inner Function: 'returnWinnerToken'
+    //(return winner's token. if no winner, return 0)
     const returnWinnerToken = () => {
-        const winCheckCombosInHere = board.winCheckCombos;
+        //(define the callback method to find an array has 3 consistent elements)
         const findWinCombos = (arrayHas3Element) => {
             const ifAll1 = arrayHas3Element.every(element => element.getValue() === 1);
             const ifAll2 = arrayHas3Element.every(element => element.getValue() === 2);
@@ -118,10 +121,12 @@ function GameController (
                 return false;
             }
         };
-        const winnerCombo = winCheckCombosInHere.find(element => findWinCombos(element));
+
+        const winnerCombo = board.winCheckCombos.find(element => findWinCombos(element));
 
         if (!winnerCombo) return 0;
 
+        //(if winnerCombo exist, any value is the winner's token)
         return winnerCombo[0].getValue();
     }
 
@@ -131,37 +136,38 @@ function GameController (
     //Inner Function: 'pseudoAIMove'
     const pseudoAIMove = () => { 
 
-        //1. Method to find the Combo that the AI with last move to win, like [2, 2, 0]
+        //1. Inner Method to find the Combo that the AI with last move to win, like [2, 2, 0]
         const if2_2_0 = (array3Els) => 
             array3Els.filter(el => el.getValue() === 2).length === 2 &&
             array3Els.filter(el => el.getValue() === 0).length === 1;
 
-        //2. Method to find the Combo that the Gamer with last move to win, like [1,1,0]
+        //2. Inner Method to find the Combo that the Gamer with last move to win, like [1,1,0]
         const if1_1_0 = (array3Els) => 
             array3Els.filter(el => el.getValue() === 1).length === 2 &&
             array3Els.filter(el => el.getValue() === 0).length === 1;
 
-        //3. if above two conditions don't exist, find ramdom empty cell and place into it.
-
         const winMoveCombo = board.winCheckCombos.find(els => if2_2_0(els));
         const blockMoveCombo = board.winCheckCombos.find(els => if1_1_0(els));
-        
+
+        //3. if above two conditions don't exist, find ramdom empty cell and place into it.      
         const theMovePlace = winMoveCombo  
             ? winMoveCombo.find(el => el.getValue() === 0) 
             : blockMoveCombo  
                 ? blockMoveCombo.find(el => el.getValue() === 0) 
                 : board.getBoard().flat().find(el => el.getValue() === 0);
         
-        return theMovePlace
+        //(It's a Cell object is returned, like 'board[1][2]', which equal to a Cell object, Cell.row=1, Cell.column=2)
+        return theMovePlace;
     }
 
 
     //MAIN FUNTION!
-    //Return Function: 'playRound' (place mark, print round, switch turn)
+    //Return Function: 'playRound' 
+    // (place mark, print round, switch turn)
     const gamerPlayRound = (row, column) => {
 
         //1. if the place is not empty, place the Mark
-        if (!board.isEmptyCell(row, column)) {
+        if (board.isCellFull(row, column)) {
             console.log('You are not placing into an empty cell!!')
             return;
         } else {
@@ -172,17 +178,17 @@ function GameController (
         const winnerToken = returnWinnerToken();
 
         if (winnerToken === 1) {
-            console.log(`Winner is ${playerOneName}!`);
+            console.log(`Winner is ${playerName}!`);
             board.printBoard();
             return;
         } else if (winnerToken === 2) {
-            console.log(`Winner is ${playerTwoName}!`);
+            console.log(`Winner is AI!`);
             board.printBoard();
             return;
         }
 
         //3. log the move and print the board
-        printPresentRound();   
+        logPresentRound();   
     
         //4. switch user
         switchPlayerTurn(); 
@@ -195,17 +201,17 @@ function GameController (
         const winnerTokenAfterAIMove = returnWinnerToken();
 
         if (winnerTokenAfterAIMove === 1) {
-            console.log(`Winner is ${playerOneName}!`);
+            console.log(`Winner is ${playerName}!`);
             board.printBoard();
             return;
         } else if (winnerTokenAfterAIMove === 2) {
-            console.log(`Winner is ${playerTwoName}!`);
+            console.log(`Winner is AI!`);
             board.printBoard();
             return;
         }
 
         //7. log the move and print the board
-        printPresentRound();   
+        logPresentRound();   
 
         //8. switch user
         switchPlayerTurn(); 
