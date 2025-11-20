@@ -149,12 +149,13 @@ function GameController (
         const winMoveCombo = board.winCheckCombos.find(els => if2_2_0(els));
         const blockMoveCombo = board.winCheckCombos.find(els => if1_1_0(els));
 
-        //3. if above two conditions don't exist, find ramdom empty cell and place into it.      
+        //3. if above two conditions don't exist, find ramdom empty cell and place into it. 
+        const emptyCells = board.getBoard().flat().filter(el => el.getValue() === 0)     
         const theMovePlace = winMoveCombo  
             ? winMoveCombo.find(el => el.getValue() === 0) 
             : blockMoveCombo  
                 ? blockMoveCombo.find(el => el.getValue() === 0) 
-                : board.getBoard().flat().find(el => el.getValue() === 0);
+                : emptyCells[Math.floor(Math.random() * emptyCells.length)];
         
         //(It's a Cell object is returned, like 'board[1][2]', which equal to a Cell object, Cell.row=1, Cell.column=2)
         return theMovePlace;

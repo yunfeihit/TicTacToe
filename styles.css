@@ -1,0 +1,74 @@
+@font-face {
+    font-family: 'comic_reliefregular';
+    src: url('fonts/comicrelief-regular-webfont.woff2') format('woff2'),
+         url('fonts/comicrelief-regular-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: comic_reliefregular;
+    background-color: black;
+}
+
+#header {
+    margin: 0 auto 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: end;
+    font-size: 32px;
+    font-weight: bold;
+    color: white;
+    text-align: center;
+    height: 80px;
+    width: 300px;
+}
+
+#introduce {
+    margin: 10px auto 30px auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+    color: white;
+    text-align: center;
+    height: 20px;
+    width: 100%;
+}
+
+#game-board {
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    height: 360px;
+    width: 360px;
+    gap: 4px;
+    background-color: white;
+}
+
+.cell {
+    background-color: black;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.cell img {
+    width: 90%;
+}
+
+
+
+#result {
+    color: white;
+    text-align: center;
+    margin-top: 24px;
+    font-size: 24px;
+}
